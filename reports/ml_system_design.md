@@ -9,9 +9,10 @@ Design a robust ML solution for real estate price prediction using structured li
 ## 1. Modeling Family
 
 ### Baseline Model:
-- **Linear Regression**
-  - Simple, interpretable
-  - Helps establish a benchmark
+- **Dummy Regressor (Mean Predictor)**
+  - Very simple and quick to implement
+  - Helps validate the pipeline
+  - Sets the absolute baseline for comparison
 
 ### Advanced Models:
 - **LightGBM**
@@ -79,10 +80,12 @@ Design a robust ML solution for real estate price prediction using structured li
 ### Baseline Features:
 - Numeric: area, kitchen area, number of rooms, floor, total floors, year built
 - Categorical: building type, region, district, material
+- Log Transformation: Apply log(price) to handle skew and outliers more effectively. Predicted values can be exponentiated back to the original scale.
 
 ### Advanced Features:
 - **Interaction Terms**: price per square meter, floor/total floors
-- **Text Features**: TF-IDF embeddings of listing description
+- **Text Features** : TF-IDF embeddings of listing descriptions using Hugging Face transformers for better semantic understanding
+- **Geo-Based Features** : distance from city center or proximity to metro stations, and neighborhood clusters
 - **External Data**: average neighborhood price, amenities, transport access
 
 ---
