@@ -13,7 +13,7 @@ def load_data(
     #     X_train, X_test, y_train, y_test
     df = pd.read_csv(file_path)
 
-    # ✅ Drop leakage columns if they exist
+    # Dropping leakage columns if any
     leakage_cols = ["Log_Price", "log_price" , "price"]
     for col in leakage_cols:
         if col in df.columns:
@@ -47,16 +47,16 @@ def leakage_scan(df, target_col=" Price, RUR", threshold=0.95):
     suspicious = corrs[corrs > threshold]
     
     if suspicious.empty:
-        print("✅ No suspiciously high correlations found.")
+        print(" No suspiciously high correlations found.")
     else:
-        print("⚠️ Potential leakage detected:")
+        print(" Potential leakage detected:")
         print(suspicious)
     
     return suspicious
 
-# Run the check here 
+# Running the check here 
 suspicious_features = leakage_scan(df, target_col=" Price, RUR", threshold=0.95)
 
-# drop them automatically 
+# dropping them automatically 
 if not suspicious_features.empty:
     df = df.drop(columns=suspicious_features.index)

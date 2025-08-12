@@ -11,37 +11,36 @@ from sklearn.model_selection import train_test_split, RepeatedKFold, GridSearchC
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from xgboost import XGBRegressor
 
-# Load data
 df = pd.read_csv("../data/final01_processed_real_estate_data.csv")
 
 df = df.loc[:, ~df.columns.duplicated()]  # drop duplicate columns
-# ✅ Drop leakage columns before split
+#  Dropping leakage columns before split
 leakage_cols = ["Log_Price", "log_price", "price"]
 for col in leakage_cols:
     if col in df.columns:
-        print(f"⚠️ Dropping potential leakage column: {col}")
+        print(f" Dropping potential leakage column: {col}")
         df = df.drop(columns=[col])
 
-# Define target and features
+# Defining target and features
 X = df.drop(columns=[" Price, RUR"])
 y = df[" Price, RUR"]
 
-# Drop high-cardinality or unnecessary features
+# Dropping high-cardinality or unnecessary features
 drop_features = [' Address', ' Address on the website', ' Contacts']
 for col in drop_features:
     if col in X.columns:
         X = X.drop(columns=col)
 
-# ✅ Clean text features if present
+# Cleaning text features if present
 if ' Additional description' in X.columns:
-    print("✅ Cleaning text column: 'Additional description'")
+    print(" Cleaning text column: 'Additional description'")
     X[' Additional description'] = (
         X[' Additional description']
         .fillna("")
         .astype(str)
     )
 
-# Define preprocessing functions
+# Defining preprocessing functions
 def parse_dates(df):
     df = df.copy()
     df[' Date'] = pd.to_datetime(df[' Date'], errors='coerce')
@@ -80,7 +79,7 @@ param_grid = {
     "model__colsample_bytree": [0.7, 1.0],
 }
 
-# ✅ Split into train/test before fitting
+# Split into train/test before fitting
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42
 )
@@ -97,13 +96,13 @@ grid_search = GridSearchCV(
 )
 grid_search.fit(X_train, y_train)
 
-# Save best params and model
+# Saving best params and model
 os.makedirs("../training_artifacts", exist_ok=True)
 with open("../training_artifacts/best_params.json", "w") as f:
     json.dump(grid_search.best_params_, f, indent=4)
 joblib.dump(grid_search.best_estimator_, "../training_artifacts/model.pkl")
 
-# ✅ Evaluate on the test set
+#  Evaluation on the test set
 y_pred = grid_search.predict(X_test)
 metrics = {
     "MAE": mean_absolute_error(y_test, y_pred),
@@ -114,13 +113,13 @@ metrics = {
 with open("../training_artifacts/metrics.json", "w") as f:
     json.dump(metrics, f, indent=4)
 
-print("✅ Best params and model saved.")
-print("📊 Test set metrics:", metrics)
+print(" Best params and model saved.")
+print(" Test set metrics:", metrics)
 
 
-# Combine features and target into one DataFrame
+# Combining features and target into one DataFrame
 df_full = X.copy()
-df_full["Price_RUR"] = y  # Append target column
+df_full["Price_RUR"] = y 
 
-# Save combined dataset
+
 df_full.to_csv("../data/preprocessed_full.csv", index=False)
