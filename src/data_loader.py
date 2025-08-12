@@ -17,7 +17,7 @@ def load_data(
     leakage_cols = ["Log_Price", "log_price" , "price"]
     for col in leakage_cols:
         if col in df.columns:
-            print(f"⚠️ Dropping potential leakage column: {col}")
+            print(f" Dropping potential leakage column: {col}")
             df = df.drop(columns=[col])
 
     X = df.drop(columns=[target_column])
