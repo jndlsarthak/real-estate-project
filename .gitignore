@@ -1,0 +1,26 @@
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Jupyter Notebook checkpoints (in case used later)
+.ipynb_checkpoints/
+
+# Model training artifacts
+training_artifacts/
+*.pkl
+*.joblib
+*.json
+*.csv
+*.npy
+
+# Logs
+*.log
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.venv/
+venv/
