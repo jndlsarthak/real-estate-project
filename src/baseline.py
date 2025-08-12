@@ -39,4 +39,4 @@ print(f"MSE:  {mse:,.2f}")
 print(f"RMSE: {rmse:,.2f}")
 print(f"R²:   {r2:.4f}")
 
-joblib.dump(baseline_pipeline, "baseline_dummy_model.joblib")
+joblib.dump(baseline_pipeline, "../training_artifacts/baseline_dummy_model.joblib")
