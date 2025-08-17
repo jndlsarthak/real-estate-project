@@ -1,9 +1,9 @@
 import pandas as pd
 import numpy as np
-from sklearn.ensemble import RandomForestRegressor
+from xgboost import XGBRegressor
 from data_loader import load_data
 
-TARGET_COLUMN = " Price, RUR"
+TARGET_COLUMN = " Price, RUR"  
 
 # Loading data
 X_train, X_test, y_train, y_test = load_data(target_column=TARGET_COLUMN)
@@ -18,11 +18,16 @@ non_numeric_cols = X_train.columns.difference(numeric_X_train.columns)
 if len(non_numeric_cols) > 0:
     print(f" Dropping non-numeric columns for feature importance: {list(non_numeric_cols)}")
 
-# Training RandomForest for feature importance
-rf = RandomForestRegressor(n_estimators=100, random_state=42)
-rf.fit(numeric_X_train, y_train)
+# Training XGBoost regressor for feature importance
+xgb = XGBRegressor(
+    n_estimators=100,
+    random_state=42,
+    n_jobs=-1,
+    objective='reg:squarederror'  # standard regression loss
+)
+xgb.fit(numeric_X_train, y_train)
 
-importances = pd.Series(rf.feature_importances_, index=numeric_X_train.columns)
+importances = pd.Series(xgb.feature_importances_, index=numeric_X_train.columns)
 importances = importances.sort_values(ascending=False)
 print("\nTop 10 feature importances:")
 print(importances.head(10))

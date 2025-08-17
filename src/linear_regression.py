@@ -1,62 +1,113 @@
-# linear_regression_model.py
-
-import pandas as pd
-from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-import joblib
+import os
 import json
+import pandas as pd
+import joblib
+import numpy as np
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler, FunctionTransformer
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.model_selection import train_test_split, RepeatedKFold, GridSearchCV
+from sklearn.linear_model import ElasticNet
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.impute import SimpleImputer
+from sklearn.pipeline import make_pipeline
 
-df = pd.read_csv("../data/preprocessed_full.csv")
+# Loading data 
+df = pd.read_csv("../data/final01_processed_real_estate_data.csv")
+df.columns = df.columns.str.strip()
 
-# Splitting features & target
-X = df.drop("Price_RUR", axis=1)
-y = df["Price_RUR"]
+leakage_cols = ["Log_Price", "log_price", "price"]
+for col in leakage_cols:
+    if col in df.columns:
+        df = df.drop(columns=[col])
 
-date_col = ' Date' 
+X = df.drop(columns=["Price, RUR"])
+y = df["Price, RUR"]
 
-if date_col in X.columns:
-    X[date_col] = X[date_col].str.strip()
-    X[date_col] = pd.to_datetime(X[date_col], format="%d.%m.%Y %H:%M", dayfirst=True, errors='coerce')
+drop_features = ['Address', 'Address on the website', 'Contacts']
+for col in drop_features:
+    if col in X.columns:
+        X = X.drop(columns=[col])
 
-    mask_valid_date = X[date_col].notna()
-    X = X.loc[mask_valid_date].copy()
-    y = y.loc[mask_valid_date].copy()
+if 'Additional description' in X.columns:
+    X['Additional description'] = X['Additional description'].fillna("").astype(str)
 
-    X.loc[:, date_col] = X[date_col].view('int64') // 10**9
-# Train-test split 
+def parse_dates(X):
+    if isinstance(X, pd.DataFrame):
+        date_series = X.iloc[:, 0]
+    elif isinstance(X, pd.Series):
+        date_series = X
+    else:
+        date_series = pd.Series(X)
+    date_series = pd.to_datetime(date_series, errors='coerce')
+    month = date_series.dt.month.fillna(0).astype(int)
+    season = month.apply(lambda m: (m % 12 + 3) // 3)
+    return pd.DataFrame({'Month': month, 'Season': season})
+
+numeric_features = X.select_dtypes(include=[np.number]).columns.tolist()
+text_features = ['Additional description'] if 'Additional description' in X.columns else []
+date_features = ['Date'] if 'Date' in X.columns else []
+categorical_features = X.select_dtypes(include='object').drop(columns=text_features + date_features, errors='ignore').columns.tolist()
+
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('num', StandardScaler(), numeric_features),
+        ('cat', OneHotEncoder(handle_unknown='ignore'), categorical_features),
+        ('text', TfidfVectorizer(max_features=100), 'Additional description') if text_features else ('drop_text', 'drop', []),
+        ('date', FunctionTransformer(parse_dates, validate=False), 'Date') if date_features else ('drop_date', 'drop', [])
+    ]
+)
+nan_columns = X.columns[X.isnull().any()].tolist()
+print("Columns with NaNs:", nan_columns)
+
+# Elastic net pipeline
+pipeline = Pipeline(steps=[
+    ('preprocess', preprocessor),
+    ('model', ElasticNet(max_iter=5000, random_state=42))
+])
+
+param_grid = {
+    'model__alpha': [0.1, 1.0, 10.0],
+    'model__l1_ratio': [0.1, 0.5, 0.9],
+}
+
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42
 )
 
-# Training simple linear regression
-lr_model = LinearRegression()
-lr_model.fit(X_train, y_train)
+cv = RepeatedKFold(n_splits=3, n_repeats=2, random_state=42)
 
-# Predictions
-y_pred_train = lr_model.predict(X_train)
-y_pred_test = lr_model.predict(X_test)
+grid_search = GridSearchCV(
+    pipeline,
+    param_grid,
+    scoring="neg_mean_absolute_error",
+    cv=cv,
+    n_jobs=-1,
+    verbose=1
+)
 
-# Metrics
-metrics_train = {
-    "MAE": mean_absolute_error(y_train, y_pred_train),
-    "RMSE": mean_squared_error(y_train, y_pred_train, squared=False),
-    "R2": r2_score(y_train, y_pred_train)
+grid_search.fit(X_train, y_train)
+
+# saving model & best parameters 
+os.makedirs("../training_artifacts", exist_ok=True)
+with open("../training_artifacts/elasticnet_best_params.json", "w") as f:
+    json.dump(grid_search.best_params_, f, indent=4)
+joblib.dump(grid_search.best_estimator_, "../training_artifacts/elasticnet_model.pkl")
+
+y_pred = grid_search.predict(X_test)
+metrics = {
+    "MAE": mean_absolute_error(y_test, y_pred),
+    "RMSE": mean_squared_error(y_test, y_pred, squared=False),
+    "R2": r2_score(y_test, y_pred)
 }
+with open("../training_artifacts/elasticnet_metrics.json", "w") as f:
+    json.dump(metrics, f, indent=4)
 
-metrics_test = {
-    "MAE": mean_absolute_error(y_test, y_pred_test),
-    "RMSE": mean_squared_error(y_test, y_pred_test, squared=False),
-    "R2": r2_score(y_test, y_pred_test)
-}
+print("ElasticNet best params and model saved.")
+print("Test set metrics (ElasticNet):", metrics)
 
-
-with open("linear_regression_metrics.json", "w") as f:
-    json.dump({"train": metrics_train, "test": metrics_test}, f, indent=4)
-
-# Saving model
-joblib.dump(lr_model, "linear_regression_model.pkl")
-
-print(" Linear Regression complete.")
-print(" Train metrics:", metrics_train)
-print(" Test metrics:", metrics_test)
+# saving preprocessed data after Elastic Net
+df_full = X.copy()
+df_full["Price_RUR"] = y
+df_full.to_csv("../data/preprocessed_full_elasticnet.csv", index=False)

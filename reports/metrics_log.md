@@ -1,0 +1,18 @@
+# Baseline model Metrics 
+
+MAE:  1,352,127.61
+MSE:  3,252,814,346,692.91
+RMSE: 1,803,556.03
+R²:   -0.0001
+
+# Metrics using XGBoost on GridSearchCV
+
+MAE: 627421.8485772358
+RMSE: 890419.7290285772
+R2: 0.7562319479176093
+
+# Metrics using Elastic Net linear algorithm 
+
+MAE: 771808.199187337
+RMSE: 1139158.7947392075
+R2: 0.6010157302765194
