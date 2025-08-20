@@ -19,6 +19,9 @@ This project processes raw real estate Excel data, engineers features, and build
 - MapBox API credentials for geocoding features are also needed.
 
 ---
+## Running the Pipeline
+
+Below is the sequence of scripts/notebooks, including expected inputs and outputs at each step:
 
 ### 1. Preprocessing
 - **notebook/eda_preprocessing**  
