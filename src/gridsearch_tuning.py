@@ -12,6 +12,7 @@ from xgboost import XGBRegressor
 
 # Loading data and strip column whitespace
 df = pd.read_csv("../data/final01_processed_real_estate_data.csv")
+#df = pd.read_csv("../data/merged_output.csv")   #the metrics recieved from this file were not as good as the original metrics
 df.columns = df.columns.str.strip()
 
 # Dropping leakage columns
@@ -73,10 +74,10 @@ pipeline = Pipeline(steps=[
 ])
 
 param_grid = {
-    "model__max_depth": [3, 5],
-    "model__learning_rate": [0.01, 0.1],
-    "model__subsample": [0.7, 1.0],
-    "model__colsample_bytree": [0.7, 1.0],
+    "model__max_depth": [ 3, 4, 5],
+    "model__learning_rate": [ 0.03, 0.05, 0.07],
+    "model__subsample": [ 0.7, 0.85, 0.1],
+    "model__colsample_bytree": [ 0.7,0.85, 1.0],
 }
 
 # Train/test split
@@ -100,8 +101,24 @@ grid_search = GridSearchCV(
     verbose=1
 )
 
-# Fitting grid search WITHOUT early stopping
+# Fitting grid search 
 grid_search.fit(X_train, y_train)
+
+##FEATURE IMPORTANCE :
+df_corr = pd.concat([X, y], axis=1)
+
+# Selecting only numeric features
+numeric_df = df_corr.select_dtypes(include=['int64', 'float64'])
+
+# Computing correlations with target
+correlations = numeric_df.corr()["Price, RUR"].drop("Price, RUR")
+correlations = correlations.sort_values(key=abs, ascending=False)
+
+# Saving artifacts 
+correlations.to_csv("../training_artifacts/feature_target_correlations.csv")
+print("\nTop 10 original features most correlated with target:")
+print(correlations.head(10))
+
 
 # Saving best params and model
 os.makedirs("../training_artifacts", exist_ok=True)

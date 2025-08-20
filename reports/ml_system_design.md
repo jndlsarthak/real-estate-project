@@ -15,12 +15,6 @@ Design a robust ML solution for real estate price prediction using structured li
   - Sets the absolute baseline for comparison
 
 ### Advanced Models:
-- **LightGBM**
-  - Fast, efficient, handles missing values
-  - Great for tabular data
-- **CatBoost**
-  - Native categorical support
-  - Robust with minimal preprocessing
 - **XGBoost**
   - Widely used in regression problems
 
@@ -65,7 +59,7 @@ Design a robust ML solution for real estate price prediction using structured li
   - Directly minimizes absolute error
 
 ### Fallback:
-- **MSE Loss** (commonly default in models like LightGBM)
+- **MSE Loss** 
   - Use while monitoring MAE on validation set
 
 ### Optional for Advanced Use:
@@ -115,5 +109,5 @@ Design a robust ML solution for real estate price prediction using structured li
 
 ## Summary
 
-This document outlines the design of the ML system to be implemented over the coming weeks. It balances simplicity and interpretability with modern ML capabilities for structured data and geospatial insights.
+This document outlines the design of the ML system to be implemented over the coming time. It balances simplicity and interpretability with modern ML capabilities for structured data and geospatial insights.
 

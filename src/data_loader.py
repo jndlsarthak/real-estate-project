@@ -3,6 +3,7 @@ from sklearn.model_selection import train_test_split
 
 def load_data(
     file_path: str = "../data/final01_processed_real_estate_data.csv",
+    #file_path: str = "../data/merged_output.csv",   #the metrics recieved from this file were not as good as the original metrics
     target_column: str = " Price, RUR",
     test_size: float = 0.2,
     random_state: int = 42
@@ -36,6 +37,7 @@ if __name__ == "__main__":
 
 
 df = pd.read_csv("../data/final01_processed_real_estate_data.csv")
+#df = pd.read_csv ("../data/merged_output.csv")
 def leakage_scan(df, target_col=" Price, RUR", threshold=0.95):
     
     if target_col not in df.columns:

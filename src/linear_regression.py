@@ -15,6 +15,7 @@ from sklearn.pipeline import make_pipeline
 
 # Loading data 
 df = pd.read_csv("../data/final01_processed_real_estate_data.csv")
+#df = pd.read_csv("../data/merged_output.csv")   #the metrics recieved from this file were not as good as the original metrics
 df.columns = df.columns.str.strip()
 
 leakage_cols = ["Log_Price", "log_price", "price"]
@@ -68,8 +69,8 @@ pipeline = Pipeline(steps=[
 ])
 
 param_grid = {
-    'model__alpha': [0.1, 1.0, 10.0],
-    'model__l1_ratio': [0.1, 0.5, 0.9],
+    'model__alpha': [0.01,0.03, 0.05,0.07, 0.1, 0.5, 1.0, 5.0, 10.0],
+    'model__l1_ratio': [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
 }
 
 X_train, X_test, y_train, y_test = train_test_split(
@@ -104,7 +105,7 @@ metrics = {
 with open("../training_artifacts/elasticnet_metrics.json", "w") as f:
     json.dump(metrics, f, indent=4)
 
-print("ElasticNet best params and model saved.")
+# print("ElasticNet best params and model saved.")
 print("Test set metrics (ElasticNet):", metrics)
 
 # saving preprocessed data after Elastic Net
