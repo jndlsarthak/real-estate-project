@@ -41,7 +41,7 @@ def parse_dates(X):
         date_series = X
     else:
         date_series = pd.Series(X)
-    date_series = pd.to_datetime(date_series, errors='coerce')
+    date_series = pd.to_datetime(date_series, errors='coerce') #daytime
     month = date_series.dt.month.fillna(0).astype(int)
     season = month.apply(lambda m: (m % 12 + 3) // 3)
     return pd.DataFrame({'Month': month, 'Season': season})

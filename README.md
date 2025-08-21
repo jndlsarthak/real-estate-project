@@ -36,7 +36,14 @@ Below is the sequence of scripts/notebooks, including expected inputs and output
   - **Input:** `data/final_processed_real_estate_data.csv`  
   - **Output:** `data/final01_processed_real_estate_data.csv`
 
-### 3. Data Loading and Baseline Modeling
+### 3. Feature Engineering 
+- **src/distance_feature.py**  
+  - **Input:** `data/russianREdata.xlsx`  
+  - **Output:** 
+    - `data/distance_and_city_flag_only.csv`
+    - `data/merged_output.csv`
+
+### 4. Data Loading and Baseline Modeling
 - **src/data_loader.py**  
   - **Input:** `data/final01_processed_real_estate_data.csv`  
   - **Output:** `load_data()`
@@ -44,12 +51,12 @@ Below is the sequence of scripts/notebooks, including expected inputs and output
   - **Input:** from data_loader output `load_data()`
   - **Output:** `training_artifacts/baseline_dummy_model.joblib`
 
-### 4. Baseline Predictions
+### 5. Baseline Predictions
 - **notebook/predict_baseline.ipynb**
 
-### 5. Hyperparameter Tuning & Grid Search
+### 6. Hyperparameter Tuning & Grid Search
 - **src/gridsearch_tuning.py**  
-  - **Input:** `data/final01_processed_real_estate_data.csv`  
+  - **Input:** `data/merged_output.csv`  
   - **Output:**  
     - `training_artifacts/feature_target_correlation.csv`  
     - `training_artifacts/best_params.json`  
@@ -57,7 +64,7 @@ Below is the sequence of scripts/notebooks, including expected inputs and output
     - `training_artifacts/metrics.json`  
     - `data/preprocessed_full.csv`
 
-### 6. Linear & ElasticNet Regression
+### 7. Linear & ElasticNet Regression
 - **src/linear_regression.py**  
   - **Input:** `data/final01_processed_real_estate_data.csv`  
   - **Output:**  
@@ -66,19 +73,14 @@ Below is the sequence of scripts/notebooks, including expected inputs and output
     - `training_artifacts/elasticnet_metrics.json`  
     - `data/preprocessed_full_elasticnet.csv`
 
-### 7. Residual Analysis
+### 8. Residual Analysis
 - **src/residual_analysis.py**  
   - **Input:** `data/preprocessed_full.csv`  
   - **Output:**  
     - `training_artifacts/residual_distribution.png`  
     - `training_artifacts/residuals_vs_predicted.png`
 
-### 8. Feature Engineering 
-- **src/distance_feature.py**  
-  - **Input:** `data/russianREdata.xlsx`  
-  - **Output:** 
-    - `data/distance_and_city_flag_only.csv`
-    - `data/merged_output.csv`
+
 
 ---
 

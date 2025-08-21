@@ -11,8 +11,8 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from xgboost import XGBRegressor
 
 # Loading data and strip column whitespace
-df = pd.read_csv("../data/final01_processed_real_estate_data.csv")
-#df = pd.read_csv("../data/merged_output.csv")   #the metrics recieved from this file were not as good as the original metrics
+#df = pd.read_csv("../data/final01_processed_real_estate_data.csv").    #the metrics recieved from this file were not as good as the other metrics
+df = pd.read_csv("../data/merged_output.csv")   
 df.columns = df.columns.str.strip()
 
 # Dropping leakage columns
@@ -104,7 +104,7 @@ grid_search = GridSearchCV(
 # Fitting grid search 
 grid_search.fit(X_train, y_train)
 
-##FEATURE IMPORTANCE :
+# FEATURE IMPORTANCE :
 df_corr = pd.concat([X, y], axis=1)
 
 # Selecting only numeric features
