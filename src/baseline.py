@@ -9,12 +9,12 @@ from data_loader import load_data
 # Loading the data
 X_train, X_test, y_train, y_test = load_data()
 
-# Dummy transformer (since DummyRegressor doesn’t use features)
+# Dummy transformer 
 class DummyTransformer(BaseEstimator, TransformerMixin):
     def fit(self, X, y=None):
         return self
     def transform(self, X):
-        return np.zeros((len(X), 1))  # dummy feature
+        return np.zeros((len(X), 1)) 
 
 # Creating the pipeline
 baseline_pipeline = Pipeline([
@@ -39,4 +39,4 @@ print(f"MSE:  {mse:,.2f}")
 print(f"RMSE: {rmse:,.2f}")
 print(f"R²:   {r2:.4f}")
 
-joblib.dump(baseline_pipeline, "baseline_dummy_model.joblib")
+joblib.dump(baseline_pipeline, "../training_artifacts/baseline_dummy_model.joblib")

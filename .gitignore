@@ -1,0 +1,19 @@
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Model training artifacts
+training_artifacts/
+*.pkl
+*.joblib
+*.json
+*.csv
+*.npy
+
+# Logs
+*.log
+
+# Environment files
+.env
+.venv/
+venv/

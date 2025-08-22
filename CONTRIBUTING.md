@@ -36,6 +36,7 @@
 ## Code & Files
 
 - Keep notebooks in the `/notebook` folder.
+- Add scripts in `/src`.
 - Add processed data to `/data` only if needed.
 - Reports go in `/reports`.
 
