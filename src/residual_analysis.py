@@ -5,9 +5,10 @@ import seaborn as sns
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import numpy as np
 
-df = pd.read_csv("../data/preprocessed_full.csv")
-X = df.drop("Price_RUR", axis=1)
-y = df["Price_RUR"]
+df = pd.read_csv("../data/merged_output.csv")
+df.columns = df.columns.str.strip()
+X = df.drop("Price, RUR", axis=1)
+y = df["Price, RUR"]
 
 def parse_dates(X):
     if isinstance(X, pd.DataFrame):
@@ -23,7 +24,7 @@ def parse_dates(X):
 
 
 # Loading trained model
-model = joblib.load("model.pkl")
+model = joblib.load("../training_artifacts/model.pkl")
 
 if 'Additional description' in X.columns:
     X['Additional description'] = X['Additional description'].fillna("")
@@ -40,7 +41,7 @@ metrics = {
     "RMSE": mean_squared_error(y, y_pred, squared=False),
     "R2": r2_score(y, y_pred)
 }
-with open("metrics.json", "w") as f:
+with open("../training_artifacts/metrics.json", "w") as f:
     import json
     json.dump(metrics, f, indent=4)
 
